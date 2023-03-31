@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-+srb&*r1w_m%!bs9xa^71q5jy_st2=49^6&9upzqb2(na5d2i^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mysite.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -39,11 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #Local apps
+    # Local apps
 
     'apps.account',
 
-    #Third party apps
+    # Third party apps
+
+    'social_django',
+    'django_extensions',
 ]
 
 
@@ -61,7 +64,28 @@ ROOT_URLCONF = 'config.urls'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'account.authentication.EmailAuthBackend',
+    'apps.account.authentication.EmailAuthBackend',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '263258300468-r7h555t83ol7b11ejrg3158l31bcr32u.apps.googleusercontent.com' # Google Client ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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' # Google Client Secret
+
+SOCIAL_AUTH_FACEBOOK_KEY = '175923385257070' # Facebook App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = '54a159c0aa3f781c54b385da8e79b0db' # Facebook App Secret
+
+SOCIAL_AUTH_PIPELINE = [
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'account.authentication.create_profile',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -130,11 +154,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR , 'static')]
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "apps-static",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
+
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
