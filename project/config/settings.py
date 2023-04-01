@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Local apps
 
     'apps.account',
+    'apps.images',
 
     # Third party apps
 
