@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'social_django',
     'django_extensions',
+    'easy_thumbnails',
 ]
 
 
@@ -155,6 +156,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type('application/javascript', '.js', True)
+    mimetypes.add_type('text/css', '.css', True)
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static/'

@@ -3,8 +3,12 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 from django.contrib.auth.decorators import login_required
-from .models import Profile
+from .models import Profile, PasswordResetCount, LoginCount
 from django.contrib import messages
+from django.contrib.auth.views import PasswordResetCompleteView
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.views import LoginView
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -66,6 +70,37 @@ def edit(request):
         else:
             messages.error(request, 'Error updating your profile')
     else:
+
         user_form = UserEditForm(instance=request.user)
         profile_form = ProfileEditForm(instance=request.user.profile)
     return render(request, 'edit.html', {'user_form': user_form, 'profile_form': profile_form})
+
+
+class MyPasswordResetCompleteView(PasswordResetCompleteView):
+
+    def get_context_data(self, *args, **kwargs):
+
+        context = super().get_context_data(*args, **kwargs)  # DICT
+        try:
+            context['password_reset_count'] = PasswordResetCount.objects.first().count
+
+        except ObjectDoesNotExist:
+            pass
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        count_object, created = PasswordResetCount.objects.get_or_create(pk=1)
+        count_object.count += 1
+        count_object.save()
+        return super().get(request, *args, **kwargs)
+
+
+class CountLoginView(LoginView):
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login_count, created = LoginCount.objects.get_or_create(id=1)
+        login_count.count += 1
+        login_count.save()
+
+        return response
